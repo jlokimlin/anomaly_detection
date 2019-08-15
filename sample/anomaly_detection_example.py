@@ -3,35 +3,30 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from helpers import get_proxie_google_connection
+from helpers import gtrends
 from pyculiarity.detect_ts import detect_ts
 
 
-TOPIC='Flu Vaccine'
+KEYWORD='Flu Vaccine'
 XLABEL='Time'
 YLABEL='Relative Interest over Time'
 
-# Login to Google
-pytrend = get_proxie_google_connection()
+# Get Google trend as a pandas DataFrame
+google_trend_df = gtrends([KEYWORD])
 
-# Create payload and capture API tokens. Only required for interest_over_time(), interest_by_region(), and related_queries() methods.
-pytrend.build_payload(kw_list=[TOPIC])
-
-# Get Google Trend of Topics  as a Pandas DataFrame
-google_trend_df = pytrend.interest_over_time()
-# Get artist Google hits as a time series
-s = google_trend_df[TOPIC]
+# Set Google hits as a time series
+ts = google_trend_df[KEYWORD]
 
 # Plot data
 # Visualize time series with matplotlib (optional but useful if we're choosing between keywords)
-plt.title('Flu Vaccine - Google Trends Data')
+plt.title(KEYWORD + ' - Google Trends Data')
 #plt.subtitle('United States search volume')
 plt.xlabel(XLABEL)
 plt.tick_params(axis='x', rotation=-45)
 plt.ylabel(YLABEL)
 plt.tight_layout()
 plt.autoscale()
-plt.plot(s.index, s.values)
+plt.plot(ts.index, ts.values)
 plt.savefig('../figures/flu_vaccine_google_trends_plot.png', bbox_inches='tight')
 plt.close()
 
@@ -48,7 +43,7 @@ References:
 '''
 
 # First prepare data from truncated series
-my_df = pd.DataFrame({'timestamp':s.values, 'observation':s.index})
+my_df = pd.DataFrame({'timestamp':ts.values, 'observation':ts.index})
 
 results = detect_ts(df=my_df,
                   max_anoms=0.1,
@@ -66,14 +61,14 @@ results = detect_ts(df=my_df,
                   title='Google Trends Data - Twitter + IQR Method',
                   verbose=False)
 
-plt.title('Flu Vaccine - Google Trends Data - Twitter + GES')
+plt.title(KEYWORD + ' - Google Trends Data - Twitter + GES')
 #plt.subtitle('United States search volume')
 plt.xlabel(XLABEL)
 plt.tick_params(axis='x', rotation=-45)
 plt.ylabel(YLABEL)
 plt.tight_layout()
 plt.autoscale()
-plt.plot(s.index, s.values)
+plt.plot(ts.index, ts.values)
 plt.plot(results['anoms'].anoms, 'o')
 plt.savefig('../figures/flu_vaccine_anomalize_plot.png', bbox_inches='tight')
 plt.close()

@@ -6,19 +6,15 @@ import matplotlib.pyplot as plt
 from helpers import gtrends
 from pyculiarity.detect_ts import detect_ts
 
-END_OF_LAST_YEAR='2018-12-20'
-KEYWORD = 'Lil Nas X'
+KEYWORD = 'Vote'
 XLABEL='Time'
 YLABEL='Relative Interest over Time'
 
 # Get Google trend as a pandas DataFrame
-google_trend_df = gtrends([KEYWORD])
+google_trend_df = gtrends(keywords=[KEYWORD], timeframe='today 5-y')
 
 # Set Google hits as a time series
 ts = google_trend_df[KEYWORD]
-
-# Truncate series at start of 2019. pytrends library defaults to 5 years.
-ts=ts.truncate(before=pd.Timestamp(END_OF_LAST_YEAR))
 
 # Plot data
 # Visualize time series with matplotlib (optional but useful if we're choosing between keywords)
@@ -30,7 +26,7 @@ plt.ylabel(YLABEL)
 plt.tight_layout()
 plt.autoscale()
 plt.plot(ts.index, ts.values)
-plt.savefig('../figures/lil_nas_x_google_trends_plot.png', bbox_inches='tight')
+plt.savefig('../figures/election_google_trends_plot.png', bbox_inches='tight')
 plt.close()
 
 '''Anomalize
@@ -49,7 +45,7 @@ References:
 my_df = pd.DataFrame({'timestamp':ts.values, 'observation':ts.index})
 
 results = detect_ts(df=my_df,
-                  max_anoms=0.2,
+                  max_anoms=0.02,
                   direction="pos",
                   alpha=0.05,
                   only_last=None,
@@ -73,5 +69,5 @@ plt.tight_layout()
 plt.autoscale()
 plt.plot(ts.index, ts.values)
 plt.plot(results['anoms'].anoms, 'o')
-plt.savefig('../figures/lil_nas_x_anomalize_plot.png', bbox_inches='tight')
+plt.savefig('../figures/election_x_anomalize_plot.png', bbox_inches='tight')
 plt.close()
